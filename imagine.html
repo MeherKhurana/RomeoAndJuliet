@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balcony Scene - Romeo and Juliet</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+    .lyrics {
+        margin: 20px auto;
+        width: 80%;
+        max-width: 800px;
+    }
+    .line {
+        transition: background-color 0.3s ease;
+    }
+    .playing {
+        background-color: yellow;
+    }
+</style>
+</head>
+<body>
+<div class="lyrics">
+    <div class="line">But, soft! what light through yonder window breaks?</div>
+    <div class="line">It is the east, and Juliet is the sun.</div>
+    <div class="line">Arise, fair sun, and kill the envious moon,</div>
+    <div class="line">Who is already sick and pale with grief,</div>
+    <div class="line">That thou her maid art far more fair than she.</div>
+    <div class="line">O, speak again, bright angel! for thou art</div>
+    <div class="line">As glorious to this night, being o'er my head</div>
+    <div class="line">As is a wingèd messenger of heaven</div>
+    <div class="line">Unto the white, upturnèd, wondering eyes</div>
+    <div class="line">Of mortals that fall back to gaze on him</div>
+    <div class="line">When he bestrides the lazy-pacing clouds</div>
+    <div class="line">And sails upon the bosom of the air.</div>
+    <div class="line">O Romeo, Romeo! wherefore art thou Romeo?</div>
+    <div class="line">Deny thy father and refuse thy name;</div>
+    <div class="line">Or, if thou wilt not, be but sworn my love,</div>
+    <div class="line">And I'll no longer be a Capulet.</div>
+    <div class="line">What's in a name? that which we call a rose</div>
+    <div class="line">By any other name would smell as sweet;</div>
+    <div class="line">So Romeo would, were he not Romeo call'd,</div>
+    <div class="line">Retain that dear perfection which he owes</div>
+    <div class="line">Without that title. Romeo, doff thy name,</div>
+    <div class="line">And for that name which is no part of thee</div>
+    <div class="line">Take all myself.</div>
+</div>
+<script>
+    const lines = document.querySelectorAll('.line');
+    let currentLineIndex = 0;
+    let utteranceStartTime = null;
+
+    function highlightLine(index) {
+        lines.forEach((line, i) => {
+            if (i === index) {
+                line.classList.add('playing');
+            } else {
+                line.classList.remove('playing');
+            }
+        });
+    }
+
+    function playLyrics() {
+        if (currentLineIndex < lines.length) {
+            highlightLine(currentLineIndex);
+            const line = lines[currentLineIndex];
+            const utterance = new SpeechSynthesisUtterance(line.textContent);
+            utterance.rate = 0.8; // Adjust the speaking rate if needed
+            speechSynthesis.speak(utterance);
+            utteranceStartTime = Date.now();
+            currentLineIndex++;
+        }
+    }
+
+    function handleSpeechEnd() {
+        const elapsedTime = Date.now() - utteranceStartTime;
+        const nextLineDelay = Math.max(2000 - elapsedTime, 0); // Adjust the minimum delay
+        setTimeout(playLyrics, nextLineDelay);
+    }
+
+    speechSynthesis.onend = handleSpeechEnd;
+
+    // Start playing the lyrics
+    playLyrics();
+</script>
+</body>
+</html>

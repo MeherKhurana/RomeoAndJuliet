@@ -1,0 +1,12 @@
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+  
+  #microphoneChart {
+    width: 80%;
+    height: 400px;
+    margin: 50px auto;
+  }
+  

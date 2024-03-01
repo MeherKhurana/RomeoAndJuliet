@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microphone Data Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    #microphoneChart {
+      position: sticky;
+      top: 10px;
+      left: 10px;
+      width: 400px;
+      height: 300px;
+      margin: 50px auto;
+      border: 20px double #00ffcc; /* Neon color */
+      border-radius: 30px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="microphoneChart"></canvas>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var ctx = document.getElementById('microphoneChart').getContext('2d');
+
+      var microphoneChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Loudness',
+            borderColor: 'rgba(0, 255, 204, 1)', // Neon green
+            backgroundColor: 'rgba(0, 255, 204, 0.1)',
+            data: [],
+          }, {
+            label: 'Clarity',
+            borderColor: 'rgba(255, 102, 255, 1)', // Neon pink
+            backgroundColor: 'rgba(255, 102, 255, 0.1)',
+            data: [],
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                fontColor: '#fff' // Neon white
+              }
+            }],
+            xAxes: [{
+              ticks: {
+                fontColor: '#fff' // Neon white
+              }
+            }]
+          },
+          legend: {
+            labels: {
+              fontColor: '#fff' // Neon white
+            }
+          }
+        }
+      });
+
+      // Access microphone and update chart
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+          var audioContext = new AudioContext();
+          var analyser = audioContext.createAnalyser();
+          var microphone = audioContext.createMediaStreamSource(stream);
+          microphone.connect(analyser);
+
+          function updateChart() {
+            var bufferLength = analyser.frequencyBinCount;
+            var dataArray = new Uint8Array(bufferLength);
+            analyser.getByteTimeDomainData(dataArray);
+
+            var loudness = 0;
+            var clarity = 0;
+
+            for (var i = 0; i < bufferLength; i++) {
+              loudness += Math.abs(dataArray[i] - 128);
+            }
+            loudness /= bufferLength;
+
+            // Example calculation for clarity (you may need to adjust this)
+            clarity = 0; // Example, replace with your own logic
+
+            // Add data to the chart
+            var time = new Date().toLocaleTimeString();
+            microphoneChart.data.labels.push(time);
+            microphoneChart.data.datasets[0].data.push(loudness);
+            microphoneChart.data.datasets[1].data.push(clarity);
+            microphoneChart.update();
+
+            // Repeat the update every second (adjust as needed)
+            setTimeout(updateChart, 100);
+          }
+
+          // Start updating the chart
+          updateChart();
+        })
+        .catch(function(err) {
+          console.error('Error accessing microphone:', err);
+        });
+    });
+  </script>
+</body>
+</html>

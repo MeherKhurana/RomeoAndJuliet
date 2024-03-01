@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romeo and Juliet Balcony Scene Lyrics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="lyrics">
+        <p>But, soft! what light through yonder window breaks? It is the east, and Juliet is the sun.</p>
+        <p>Arise, fair sun, and kill the envious moon, Who is already sick and pale with grief,</p>
+        <p>That thou her maid art far more fair than she: Be not her maid, since she is envious;</p>
+        <p>Her vestal livery is but sick and green And none but fools do wear it; cast it off.</p>
+    </div>
+    <button id="startBtn">Start Highlighting</button>
+    <p id="averageScore"></p>
+    <script>
+        const lyricsContainer = document.getElementById('lyrics');
+        const lyricsParagraphs = lyricsContainer.querySelectorAll('p');
+        let currentLineIndex = 0;
+        let recognizing = false;
+        let totalMatchPercentage = 0;
+        let matchedLinesCount = 0;
+        let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = function () {
+            recognizing = true;
+            console.log('Recognition started...');
+        };
+
+        recognition.onend = function () {
+            recognizing = false;
+            console.log('Recognition ended.');
+            if (currentLineIndex < lyricsLines.length) {
+                highlightNextLine();
+            } else {
+                const averageScore = calculateAverageScore();
+                document.getElementById('averageScore').textContent = `Average Match Percentage: ${averageScore.toFixed(2)}%`;
+                if (averageScore >= 45) {
+                    window.location.href = 'win.html';
+                } else {
+                    window.location.href = 'lose.html';
+                }
+            }
+        };
+
+        recognition.onresult = function (event) {
+            console.log('Speech recognition result:', event.results);
+            const result = event.results[0][0].transcript.trim().toLowerCase();
+            console.log('User said:', result);
+            const currentLine = getCurrentLine().toLowerCase();
+            console.log('Expected line:', currentLine);
+            const matchPercentage = calculateMatchPercentage(result, currentLine);
+            console.log('Match percentage:', matchPercentage);
+            if (matchPercentage >= 15) { // Check if match percentage is over 15%
+                highlightLine(currentLineIndex);
+                totalMatchPercentage += matchPercentage;
+                matchedLinesCount++;
+                currentLineIndex++;
+                console.log('Line matched. Proceeding to next line.');
+                if (currentLineIndex < lyricsLines.length) {
+                    highlightNextLine();
+                } else {
+                    recognition.stop();
+                }
+            } else {
+                console.log('Line not matched. Match percentage:', matchPercentage);
+            }
+        };
+
+        document.getElementById('startBtn').addEventListener('click', function () {
+            if (recognizing) {
+                recognition.stop();
+                return;
+            }
+            highlightNextLine();
+            recognition.start();
+        });
+
+        function highlightNextLine() {
+            const currentLine = getCurrentLine();
+            if (currentLine) {
+                highlightLine(currentLineIndex);
+            }
+        }
+
+        function highlightLine(index) {
+            const lines = lyricsLines;
+            const line = lines[index];
+            const paragraph = lyricsParagraphs[index];
+            const content = paragraph.innerHTML;
+            const newContent = content.replace(line, `<span class="highlight">${line}</span>`);
+            paragraph.innerHTML = newContent;
+        }
+
+        function getCurrentLine() {
+            const lines = lyricsLines;
+            return lines[currentLineIndex];
+        }
+
+        function extractLines(text) {
+            return text.split('\n').filter(line => line.trim() !== '');
+        }
+
+        let lyricsLines = [];
+        lyricsParagraphs.forEach(function (paragraph) {
+            const text = paragraph.textContent;
+            const lines = extractLines(text);
+            lyricsLines = lyricsLines.concat(lines);
+        });
+
+        function calculateMatchPercentage(userInput, expectedInput) {
+            const maxLength = Math.max(userInput.length, expectedInput.length);
+            const distance = levenshteinDistance(userInput, expectedInput);
+            return ((maxLength - distance) / maxLength) * 100;
+        }
+
+        function levenshteinDistance(s1, s2) {
+            const len1 = s1.length;
+            const len2 = s2.length;
+            let matrix = [];
+
+            // Initialize matrix
+            for (let i = 0; i <= len1; i++) {
+                matrix[i] = [i];
+            }
+
+            for (let j = 0; j <= len2; j++) {
+                matrix[0][j] = j;
+            }
+
+            // Calculate Levenshtein distance
+            for (let i = 1; i <= len1; i++) {
+                for (let j = 1; j <= len2; j++) {
+                    const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j] + 1, // deletion
+                        matrix[i][j - 1] + 1, // insertion
+                        matrix[i - 1][j - 1] + cost // substitution
+                    );
+                }
+            }
+
+            return matrix[len1][len2];
+        }
+
+        function calculateAverageScore() {
+            return totalMatchPercentage / matchedLinesCount;
+        }
+    </script>
+</body>
+
+</html>

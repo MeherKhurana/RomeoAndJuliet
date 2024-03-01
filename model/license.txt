@@ -1,0 +1,11 @@
+Model Information:
+* title:	Globe Theatre Painted
+* source:	https://sketchfab.com/3d-models/globe-theatre-painted-a17bd220dc4540b380d5431ee72ceed4
+* author:	adamlheet (https://sketchfab.com/adamlheet)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Globe Theatre Painted" (https://sketchfab.com/3d-models/globe-theatre-painted-a17bd220dc4540b380d5431ee72ceed4) by adamlheet (https://sketchfab.com/adamlheet) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
